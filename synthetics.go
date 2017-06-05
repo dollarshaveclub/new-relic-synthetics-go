@@ -22,7 +22,7 @@ import (
 const (
 	timeFormat = "2006-01-02T15:04:05.999999999-0700"
 
-	// The different type of monitor types.
+	// The different monitor types.
 	TypeSimple        = "SIMPLE"
 	TypeBrowser       = "BROWSER"
 	TypeScriptAPI     = "SCRIPT_API"
@@ -134,7 +134,7 @@ type GetAllMonitorsResponse struct {
 }
 
 // GetAllMonitors returns all monitors within a New Relic Synthetics
-// account.
+// account. Values of -1 indicate to use the defaults.
 func (c *Client) GetAllMonitors(offset, limit uint) (*GetAllMonitorsResponse, error) {
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
