@@ -10,27 +10,27 @@ the GoDoc link above.
 ## Example
 
 ```go
-	conf := func(s *synthetics.Client) {
-		s.APIKey = os.Getenv("NEWRELIC_API_KEY")
-	}
-	client, _ := synthetics.NewClient(conf)
+conf := func(s *synthetics.Client) {
+	s.APIKey = os.Getenv("NEWRELIC_API_KEY")
+}
+client, _ := synthetics.NewClient(conf)
 
-	// Get specific monitor
-	client.GetMonitor("monitor-id")
+// Get specific monitor
+client.GetMonitor("monitor-id")
 
-	// Create a monitor
-	client.CreateMonitor(&synthetics.CreateMonitorArgs{
-		Name:         "sample-monitor",
-		Type:         "SIMPLE",
-		Frequency:    60,
-		URI:          "https://www.dollarshaveclub.com",
-		Locations:    []string{"AWS_US_WEST_1"},
-		Status:       "ENABLED",
-		SLAThreshold: 7,
-	})
+// Create a monitor
+client.CreateMonitor(&synthetics.CreateMonitorArgs{
+	Name:         "sample-monitor",
+	Type:         "SIMPLE",
+	Frequency:    60,
+	URI:          "https://www.dollarshaveclub.com",
+	Locations:    []string{"AWS_US_WEST_1"},
+	Status:       "ENABLED",
+	SLAThreshold: 7,
+})
 
-    // Update monitor
-	client.UpdateMonitor("monitor-id", &synthetics.UpdateMonitorArgs{
-		Name: "new-name",
-	})
+// Update monitor
+client.UpdateMonitor("monitor-id", &synthetics.UpdateMonitorArgs{
+	Name: "new-name",
+})
 ```
