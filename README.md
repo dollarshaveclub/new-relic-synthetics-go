@@ -32,6 +32,13 @@ client.CreateMonitor(&synthetics.CreateMonitorArgs{
 
 // Update monitor
 client.UpdateMonitor("monitor-id", &synthetics.UpdateMonitorArgs{
-	Name: "new-name",
+	Name: "new-monitor-name",
+})
+
+// Create an alert condition
+client.CreateAlertCondition("policy-id"), &synthetics.CreateAlertConditionArgs{
+	Name: "alert-condition-name",
+	MonitorID: "monitor-id",
+	Enabled: true,
 })
 ```
