@@ -86,7 +86,7 @@ func TestGetAllMonitors(t *testing.T) {
 }
 
 func TestIntegration(t *testing.T) {
-	// t.Skip()
+	t.Skip()
 
 	args := &synthetics.CreateMonitorArgs{
 		Name:         "david-test-1",
