@@ -1,6 +1,7 @@
 # new-relic-synthetics-go
 
 [![GoDoc](https://godoc.org/github.com/dollarshaveclub/new-relic-synthetics-go?status.svg)](https://godoc.org/github.com/dollarshaveclub/new-relic-synthetics-go)
+[![CircleCI](https://circleci.com/gh/dollarshaveclub/new-relic-synthetics-go.svg?style=svg)](https://circleci.com/gh/dollarshaveclub/new-relic-synthetics-go)
 
 A [New Relic Synthetics](https://newrelic.com/synthetics) API client
 for Go. This package provides CRUD functionality for both Synthetics
