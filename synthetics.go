@@ -15,6 +15,8 @@ import (
 
 	"encoding/base64"
 
+	"net/url"
+
 	"github.com/dollarshaveclub/new-relic-synthetics-go/util"
 	"github.com/pkg/errors"
 )
@@ -137,19 +139,27 @@ type GetAllMonitorsResponse struct {
 // account. Values of -1 indicate to use the defaults.
 func (c *Client) GetAllMonitors(offset, limit uint) (*GetAllMonitorsResponse, error) {
 	requestFunc := func() (*http.Request, error) {
+		url, err := url.Parse("https://synthetics.newrelic.com/synthetics/api/v3/monitors")
+		if err != nil {
+			return nil, err
+		}
+
+		q := url.Query()
+		if offset > 0 {
+			q.Add("offset", strconv.FormatUint(uint64(offset), 10))
+		}
+		if limit > 0 {
+			q.Add("limit", strconv.FormatUint(uint64(limit), 10))
+		}
+		url.RawQuery = q.Encode()
+
 		request, err := c.getRequest(
 			"GET",
-			"https://synthetics.newrelic.com/synthetics/api/v3/monitors",
+			url.String(),
 			nil,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "error: could not create GetAllMonitors request")
-		}
-		if offset > 0 {
-			request.Form.Add("offset", strconv.FormatUint(uint64(offset), 10))
-		}
-		if limit > 0 {
-			request.Form.Add("limit", strconv.FormatUint(uint64(limit), 10))
 		}
 		return request, nil
 	}
