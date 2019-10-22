@@ -13,6 +13,10 @@ the GoDoc link above.
 ```go
 conf := func(s *synthetics.Client) {
 	s.APIKey = os.Getenv("NEWRELIC_API_KEY")
+
+	// SyntheticsBaseURL is optional.
+	// Default is https://synthetics.newrelic.com/synthetics/api/v3
+	s.SyntheticsBaseURL = os.Getenv("NEWRELIC_SYNTHETICS_API_URL")
 }
 client, _ := synthetics.NewClient(conf)
 

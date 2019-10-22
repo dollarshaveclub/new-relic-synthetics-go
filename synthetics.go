@@ -29,10 +29,13 @@ const (
 	TypeBrowser       = "BROWSER"
 	TypeScriptAPI     = "SCRIPT_API"
 	TypeScriptBrowser = "SCRIPT_BROWSER"
+
+	// SyntheticsBaseURL sets the base URL for the synthetics API.
+	SyntheticsBaseURL = "https://synthetics.newrelic.com/synthetics/api/v3"
 )
 
 var (
-	monitorURL = regexp.MustCompile(`^https://synthetics.newrelic.com/synthetics/api/v3/monitors/(.+)$`)
+	monitorURL = regexp.MustCompile(`^` + SyntheticsBaseURL + `/monitors/(.+)$`)
 
 	// ErrMonitorNotFound is returned when a monitor can't be
 	// found.
@@ -49,8 +52,9 @@ var (
 
 // Client is a client to New Relic Synthetics.
 type Client struct {
-	APIKey     string
-	HTTPClient HTTPClient
+	APIKey            string
+	SyntheticsBaseURL string
+	HTTPClient        HTTPClient
 
 	// The HTTP client that's actually used.
 	httpClient RetryableHTTPClient
@@ -62,6 +66,10 @@ func NewClient(configs ...func(*Client)) (*Client, error) {
 
 	for _, config := range configs {
 		config(client)
+	}
+
+	if client.SyntheticsBaseURL == "" {
+		client.SyntheticsBaseURL = SyntheticsBaseURL
 	}
 
 	// Validate configuration
@@ -139,7 +147,7 @@ type GetAllMonitorsResponse struct {
 // account. Values of -1 indicate to use the defaults.
 func (c *Client) GetAllMonitors(offset, limit uint) (*GetAllMonitorsResponse, error) {
 	requestFunc := func() (*http.Request, error) {
-		url, err := url.Parse("https://synthetics.newrelic.com/synthetics/api/v3/monitors")
+		url, err := url.Parse(c.SyntheticsBaseURL + "/monitors")
 		if err != nil {
 			return nil, err
 		}
@@ -221,7 +229,7 @@ func (c *Client) GetMonitor(id string) (*Monitor, error) {
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
 			"GET",
-			fmt.Sprintf("https://synthetics.newrelic.com/synthetics/api/v3/monitors/%s", id),
+			fmt.Sprintf(c.SyntheticsBaseURL+"/monitors/%s", id),
 			nil,
 		)
 		if err != nil {
@@ -327,7 +335,7 @@ func (c *Client) CreateMonitor(m *CreateMonitorArgs) (*Monitor, error) {
 
 		request, err := c.getRequest(
 			"POST",
-			"https://synthetics.newrelic.com/synthetics/api/v3/monitors",
+			c.SyntheticsBaseURL+"/monitors",
 			reqBody,
 		)
 		if err != nil {
@@ -417,7 +425,7 @@ func (c *Client) UpdateMonitor(id string, args *UpdateMonitorArgs) (*Monitor, er
 		}
 		request, err := c.getRequest(
 			"PATCH",
-			fmt.Sprintf("https://synthetics.newrelic.com/synthetics/api/v3/monitors/%s", id),
+			fmt.Sprintf(c.SyntheticsBaseURL+"/monitors/%s", id),
 			reqBody,
 		)
 		if err != nil {
@@ -455,7 +463,7 @@ func (c *Client) DeleteMonitor(id string) error {
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
 			"DELETE",
-			fmt.Sprintf("https://synthetics.newrelic.com/synthetics/api/v3/monitors/%s", id),
+			fmt.Sprintf(c.SyntheticsBaseURL+"/monitors/%s", id),
 			nil,
 		)
 		if err != nil {
@@ -514,7 +522,7 @@ func (c *Client) UpdateMonitorScript(id string, args *UpdateMonitorScriptArgs) e
 		}
 		request, err := c.getRequest(
 			"PUT",
-			fmt.Sprintf("https://synthetics.newrelic.com/synthetics/api/v3/monitors/%s/script", id),
+			fmt.Sprintf(c.SyntheticsBaseURL+"/monitors/%s/script", id),
 			reqBody,
 		)
 		if err != nil {
@@ -547,7 +555,7 @@ func (c *Client) GetMonitorScript(id string) (string, error) {
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
 			"GET",
-			fmt.Sprintf("https://synthetics.newrelic.com/synthetics/api/v3/monitors/%s/script", id),
+			fmt.Sprintf(c.SyntheticsBaseURL+"/monitors/%s/script", id),
 			nil,
 		)
 		if err != nil {
