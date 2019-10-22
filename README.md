@@ -5,8 +5,9 @@
 
 A [New Relic Synthetics](https://newrelic.com/synthetics) API client
 for Go. This package provides CRUD functionality for both Synthetics
-monitors and alert conditions. Detailed API docs can be found on
-the GoDoc link above.
+monitors, backed by the [New Relic Synthetics API](https://docs.newrelic.com/docs/apis/synthetics-rest-api), and Synthetics alert conditions, backed by the [New Relic V2 API](https://docs.newrelic.com/docs/apis/rest-api-v2).
+
+Detailed API docs for this client can be found on the GoDoc link above.
 
 ## Example
 
@@ -17,6 +18,10 @@ conf := func(s *synthetics.Client) {
 	// SyntheticsBaseURL is optional.
 	// Default is https://synthetics.newrelic.com/synthetics/api/v3
 	s.SyntheticsBaseURL = os.Getenv("NEWRELIC_SYNTHETICS_API_URL")
+
+	// V2BaseURL is optional.
+	// Default is https://api.newrelic.com/v2
+	s.V2BaseURL = os.Getenv("NEWRELIC_V2_API_URL")
 }
 client, _ := synthetics.NewClient(conf)
 

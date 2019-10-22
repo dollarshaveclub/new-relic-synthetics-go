@@ -16,9 +16,11 @@ func client() *synthetics.Client {
 		if apiKey := os.Getenv("NEWRELIC_API_KEY"); apiKey != "" {
 			s.APIKey = apiKey
 			s.SyntheticsBaseURL = os.Getenv("NEWRELIC_SYNTHETICS_API_URL")
+			s.V2BaseURL = os.Getenv("NEWRELIC_V2_API_URL")
 		} else {
 			s.APIKey = "NEWRELIC_API_KEY"
 			s.SyntheticsBaseURL = os.Getenv("NEWRELIC_SYNTHETICS_API_URL")
+			s.V2BaseURL = os.Getenv("NEWRELIC_V2_API_URL")
 		}
 	}
 	client, err := synthetics.NewClient(conf)
@@ -45,7 +47,7 @@ func TestGetMonitor(t *testing.T) {
 		SLAThreshold: 7,
 	}
 
-	httpmock.RegisterResponder("GET", fmt.Sprintf(synthetics.BaseURL+"/monitors/%s", id),
+	httpmock.RegisterResponder("GET", fmt.Sprintf(synthetics.SyntheticsBaseURL+"/monitors/%s", id),
 		func(req *http.Request) (*http.Response, error) {
 			resp, err := httpmock.NewJsonResponse(200, monitor)
 			if err != nil {
@@ -90,6 +92,33 @@ func TestSyntheticsBaseURL(t *testing.T) {
 
 	os.Setenv("NEWRELIC_SYNTHETICS_API_URL", baseURL)
 	_, err := client().GetMonitor(monitorId)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestV2BaseURL(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	policyId, alertConditionId := uint(0), uint(0)
+	baseURL := "https://testing.com"
+
+	acs := &map[string][]*synthetics.AlertCondition{
+		"synthetics_conditions": []*synthetics.AlertCondition{
+			&synthetics.AlertCondition{},
+		},
+	}
+
+	httpmock.RegisterResponder("GET", fmt.Sprintf(baseURL+"/alerts_synthetics_conditions.json?policy_id=%d", policyId),
+		func(req *http.Request) (*http.Response, error) {
+			resp, _ := httpmock.NewJsonResponse(200, acs)
+			return resp, nil
+		},
+	)
+
+	os.Setenv("NEWRELIC_V2_API_URL", baseURL)
+	_, err := client().GetAlertCondition(policyId, alertConditionId)
 	if err != nil {
 		t.Fatal(err)
 	}

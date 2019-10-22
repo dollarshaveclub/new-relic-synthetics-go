@@ -31,7 +31,12 @@ const (
 	TypeScriptBrowser = "SCRIPT_BROWSER"
 
 	// SyntheticsBaseURL sets the base URL for the synthetics API.
+	// Default is https://synthetics.newrelic.com/synthetics/api/v3
 	SyntheticsBaseURL = "https://synthetics.newrelic.com/synthetics/api/v3"
+
+	// V2BaseURL sets the base URL for the V2 API.
+	// Default is https://api.newrelic.com/v2
+	V2BaseURL = "https://api.newrelic.com/v2"
 )
 
 var (
@@ -50,10 +55,11 @@ var (
 	ErrAlertConditionNotFound = errors.New("error: alert condition not found")
 )
 
-// Client is a client to New Relic Synthetics.
+// Client is a client to New Relic's Synthetics API and V2 API.
 type Client struct {
 	APIKey            string
 	SyntheticsBaseURL string
+	V2BaseURL         string
 	HTTPClient        HTTPClient
 
 	// The HTTP client that's actually used.
@@ -70,6 +76,10 @@ func NewClient(configs ...func(*Client)) (*Client, error) {
 
 	if client.SyntheticsBaseURL == "" {
 		client.SyntheticsBaseURL = SyntheticsBaseURL
+	}
+
+	if client.V2BaseURL == "" {
+		client.V2BaseURL = V2BaseURL
 	}
 
 	// Validate configuration
@@ -629,7 +639,7 @@ func (c *Client) CreateAlertCondition(policyID uint, args *CreateAlertConditionA
 		}
 		request, err := c.getRequest(
 			"POST",
-			fmt.Sprintf("https://api.newrelic.com/v2/alerts_synthetics_conditions/policies/%d.json", policyID),
+			fmt.Sprintf(c.V2BaseURL+"/alerts_synthetics_conditions/policies/%d.json", policyID),
 			requestBuf,
 		)
 		if err != nil {
@@ -686,7 +696,7 @@ func (c *Client) UpdateAlertCondition(alertConditionID uint, args *UpdateAlertCo
 		}
 		request, err := c.getRequest(
 			"PUT",
-			fmt.Sprintf("https://api.newrelic.com/v2/alerts_synthetics_conditions/%d.json", alertConditionID),
+			fmt.Sprintf(c.V2BaseURL+"/alerts_synthetics_conditions/%d.json", alertConditionID),
 			requestBuf,
 		)
 		if err != nil {
@@ -726,7 +736,7 @@ func (c *Client) DeleteAlertCondition(alertConditionID uint) error {
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
 			"DELETE",
-			fmt.Sprintf("https://api.newrelic.com/v2/alerts_synthetics_conditions/%d.json", alertConditionID),
+			fmt.Sprintf(c.V2BaseURL+"/alerts_synthetics_conditions/%d.json", alertConditionID),
 			nil,
 		)
 		if err != nil {
@@ -758,7 +768,7 @@ func (c *Client) GetAlertCondition(policyID, alertConditionID uint) (*AlertCondi
 	requestFunc := func() (*http.Request, error) {
 		request, err := c.getRequest(
 			"GET",
-			fmt.Sprintf("https://api.newrelic.com/v2/alerts_synthetics_conditions.json?policy_id=%d", policyID),
+			fmt.Sprintf(c.V2BaseURL+"/alerts_synthetics_conditions.json?policy_id=%d", policyID),
 			nil,
 		)
 		if err != nil {
